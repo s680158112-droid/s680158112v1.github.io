@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<title>โปรแกรมดูดวง ตำราพรหมชาติ</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .app-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%;
+        max-width: 450px;
+    }
+    h2 {
+        color: #2c3e50;
+        margin-top: 0;
+        margin-bottom: 25px;
+    }
+    .wheel-container {
+        position: relative;
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto 30px auto;
+    }
+    .pointer {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 25px solid #e74c3c;
+        z-index: 10;
+        filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+    }
+    .wheel-image {
+        width: 100%;
+        height: auto;
+        border-radius: 50%;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        transition: transform 4s cubic-bezier(0.15, 0.85, 0.15, 1);
+        transform: rotate(0deg);
+        display: block;
+    }
+    .input-group {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+    }
+    .input-group input, .input-group select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+    .input-group input:focus, .input-group select:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+    }
+    .btn-submit {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.1s ease, box-shadow 0.3s ease;
+        margin-top: 10px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .btn-submit:hover {
+        box-shadow: 0 6px 20px rgba(253, 160, 133, 0.4);
+        transform: translateY(-2px);
+    }
+    .btn-submit:active {
+        transform: translateY(1px);
+    }
+    .btn-submit:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+    #result-area {
+        display: none;
+        margin-top: 25px;
+    }
+    .result-name {
+        font-size: 24px;
+        color: #e74c3c;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .result-desc {
+        color: #34495e;
+        font-size: 15px;
+        line-height: 1.6;
+        text-align: justify;
+        padding: 15px;
+        background-color: #f1f2f6;
+        border-radius: 10px;
+    }
+    .remedy-box {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #fff3cd;
+        border-left: 5px solid #ffc107;
+        color: #856404;
+        font-size: 14px;
+        text-align: left;
+        border-radius: 5px;
+        display: none;
+    }
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
+<body>
+
+<div class="app-container">
+    <h2>🔮 ทำนายดวง ตำราพรหมชาติ</h2>
+    
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV6VSobHpIXGrosD737T4i6i1b9ruF4j--KUYgoNo08B2cCJOwfOHBgQFz&s=10" id="wheel-image" class="wheel-image" alt="ผังตำราพรหมชาติ" />
+    </div>
+    
+    <div class="input-group">
+        <label for="age">อายุ (ปีเข้าย่าง)</label>
+        <input type="number" id="age" placeholder="กรอกอายุของคุณ" min="1" max="120" />
+    </div>
+
+    <div class="input-group">
+        <label for="gender">เพศ</label>
+        <select id="gender">
+            <option value="male">ชาย (นับเวียนขวา)</option>
+            <option value="female">หญิง (นับเวียนซ้าย)</option>
+        </select>
+    </div>
+
+    <button class="btn-submit" id="calc-btn" onclick="startFortune()">คำนวณดวงชะตา</button>
+
+    <div id="result-area">
+        <div id="result-name" class="result-name"></div>
+        <div id="result-desc" class="result-desc"></div>
+        <div id="remedy-box" class="remedy-box"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    const fortunes = [
+        null,
+        { name: "เจดีย์", desc: "ท่านจะได้ใช้ชีวิตอย่างร่มเย็นเป็นสุข จะมีแต่ความสุขกายสบายใจ จะได้ทำบุญกุศลในศาสนา ปรารถนาสิ่งใดจะได้สมดั่งหวังทุกประการ", remedy: "" },
+        { name: "ฉัตรเงิน", desc: "ท่านจะมีสุข จะมีโชคลาภเงินทองมากมาย จะมีผู้ใหญ่อุปถัมภ์ค้ำจุน ถ้าทำราชการหรือค้าขาย ก็จะมีความเจริญก้าวหน้ายิ่งขึ้น", remedy: "" },
+        { name: "คนคอขาด", desc: "ท่านจะได้รับความเดือดร้อน จะได้รับความร้อนใจต่าง ๆ ซึ่งจะมีผู้ทำให้แก่ท่าน และจะได้รับความทุกข์ยากลำบาก ทำให้ท่านต้องเสียทรัพย์สินเงินทองอยู่เสมอ", remedy: "จุดธูป 5 ดอก นอกกลางแจ้งหันหน้าไปทิศตะวันออกท่องคาถาพญายม 'ปะโตเมตัง ปะระชีวินัง สุขะโตจุติ จิตตะเมตะ นิพพานัง สุขะโตจุติ' 5 จบ ปักธูปลงดินขอพรให้ดวงชะตาร้ายกลายเป็นดีหลังจากนั้นไปทำบุญให้ชีวิตสัตว์" },
+        { name: "เรือนหลวง", desc: "ท่านจะได้รับแต่ความสุขสบาย มีความเจริญก้าวหน้าในกิจการทุกอย่าง ท่านจะมีโชคลาภ ได้เงินทอง จะมีผู้อุปถัมภ์อย่างดียิ่ง พวกศัตรูที่คิดร้ายจะแพ้ภัยตัวเอง", remedy: "" },
+        { name: "ปราสาททอง", desc: "ถ้าเป็นโสดจะได้พบเนื้อคู่ ชะตาชีวิตของท่านจะได้พบแต่ความสุข เจริญก้าวหน้า กิจการที่ทำจะได้ผลประโยชน์แก่ท่านเป็นที่พึงใจ จะสมความปรารถนาทุกประการ", remedy: "" },
+        { name: "ราหู", desc: "ท่านจะได้รับความร้อนอกร้อนใจ จะเป็นถ้อยความผู้อื่นที่ทำให้ท่านได้รับความร้อนใจอยู่เสมอ ทำให้ท่านต้องเสียทรัพย์สินเงินทอง จะเกิดเป็นปากเสียงกับเพื่อนบ้าน", remedy: "ไหว้หลวงพ่อโต วัดป่าเลไลย์ หรือไหว้พระที่บ้าน จุดธูป 3 ดอก เทียน 2 เล่ม ท่องคาถา 'โตเสนโต วะระธัมเมนะ โตสัฏฐาเน สิเว วะเร โตสังอะกะสิ ชันตูนัง โตสะจิตตัง นะมามิหังฯ' เท่าอายุย่าง" },
+        { name: "ฉัตรทอง", desc: "ท่านจะได้ประสบโชคลาภ มั่งมีด้วยทรัพย์สินเงินทอง พร้อมด้วยลาภยศมิตรสหาย จะมีผู้ใหญ่คอยให้ความอุปถัมภ์เป็นอย่างดี จะมีแต่ความสุขความเจริญ", remedy: "" },
+        { name: "เทวดาขี่เต่า", desc: "ท่านจะมีความสุขพอประมาณ การเงินการทองพอมีใช้มีจ่าย จะทำอะไรจงคิดให้รอบคอบเสียก่อน มิฉะนั้นจะเกิดผลผิดพลาดขึ้นได้ และจะทำให้เดือดร้อนใจ", remedy: "" },
+        { name: "คนต้องขื่อคา", desc: "จัดว่าชะตาตกอยู่ในฐานะมิสู้ดี จงมีความระวังในญาติพี่น้อง จะนำความเดือดร้อนใจมาให้ คนรักมักจะเอาใจออกห่าง ให้ระวังอันตราย จงทำบุญกุศลสะเดาะเคราะห์", remedy: "ไหว้หลวงพ่อโสธร หรือไหว้พระที่บ้าน จุดธูป 19 ดอก พวงมาลัยมะลิ 1 พวง ท่องคาถา 'อิติ อิติ อิติ โสธโร นะโมพุทธายะ ยะธาพุทธโมนะ' 19 จบ" },
+        { name: "พ่อหมอ", desc: "จะพบผู้ใหญ่อุปถัมภ์ค้ำชูแก่ท่าน ให้ยศศักดิ์ ท่านจะมีความสุขเจริญก้าวหน้า จะมีโชคลาภมาสู่ท่าน เป็นที่พึงใจยิ่ง โพยภัยมิได้มีมาพ้องพานเลย", remedy: "" },
+        { name: "แม่มด", desc: "ท่านจะได้พบผู้เฒ่าเจ้านายที่มีความค้ำชูให้ท่านได้พบกับความสุขความเจริญ คำพูดของท่านจะเป็นที่ไว้เนื้อเชื่อใจ จะไปแห่งใดมีแต่คนรักใคร่ แต่จะต้องเหนื่อยกายใจบ้าง", remedy: "" },
+        { name: "นาคราช", desc: "จัดว่าร้าย จงระวังจะเกิดพยาธิ การเจ็บไข้ได้รับความเจ็บปวด เลือดจะออกจากตัว ให้เกรงเขี้ยวงาและของมีคม จะมีผู้ปองร้าย จงจำศีลภาวนา อย่าเบียดเบียนสัตว์", remedy: "ถวายสังฆทาน อาหารกระป๋อง, ใบมีดโกน, รัดปะคด อุทิศให้เจ้ากรรมนายเวร แล้วไหว้พระที่บ้านจุดธูป 5 ดอก ท่อง 'ปุพพะ นิมิตตัง ทัฬหังนิติ อรหังพุทโธ...' 9 จบ" }
+    ];
+
+    let currentRotation = 0;
+
+    function startFortune() {
+        const age = parseInt(document.getElementById('age').value);
+        const gender = document.getElementById('gender').value;
+
+        if (isNaN(age) || age <= 0) {
+            alert("กรุณากรอกอายุให้ถูกต้องครับ");
+            return;
+        }
+
+        let pos = 1;
+        let rem = age % 12; 
+
+        if (gender === 'male') {
+            pos = (rem === 0) ? 12 : rem;
+        } else {
+            pos = (14 - rem) % 12;
+            if (pos === 0) pos = 12;
+        }
+
+        const finalResult = fortunes[pos];
+        spinWheel(pos, finalResult);
+    }
+
+    function spinWheel(pos, finalResult) {
+        const wheelImage = document.getElementById('wheel-image');
+        const resultArea = document.getElementById('result-area');
+        const nameText = document.getElementById('result-name');
+        const descText = document.getElementById('result-desc');
+        const remedyBox = document.getElementById('remedy-box');
+        const btn = document.getElementById('calc-btn');
+
+        resultArea.style.display = 'block';
+        nameText.innerHTML = "กำลังทำนายดวงชะตา...";
+        descText.innerHTML = "";
+        remedyBox.style.display = 'none';
+        btn.disabled = true;
+
+        const itemAngle = ((7 - pos) * 30 + 360) % 360;
+        const spins = 5 * 360;
+        
+        const remainder = currentRotation % 360;
+        currentRotation = currentRotation - remainder - spins - itemAngle;
+
+        wheelImage.style.transform = `rotate(${currentRotation}deg)`;
+
+        setTimeout(() => {
+            nameText.innerHTML = `ดวงชะตาตก: ${finalResult.name}`;
+            descText.innerHTML = `<strong>คำทำนาย:</strong> ${finalResult.desc}`;
+
+            if (finalResult.remedy !== "") {
+                remedyBox.style.display = 'block';
+                remedyBox.innerHTML = `<strong>🛠️ วิธีแก้ชะตา/เสริมดวง:</strong><br>${finalResult.remedy}`;
+            }
+            btn.disabled = false;
+        }, 4000); 
+    }
+</script>
+
+</body>
+</html>
